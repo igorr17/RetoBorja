@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - Mi API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+            margin: 0;
+        }
+        .card {
+            background-color: #1e293b;
+            padding: 25px 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 420px;
+        }
+        h2 { margin-top: 0; color: #38bdf8; text-align: center; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            outline: none;
+        }
+        button {
+            padding: 10px 16px;
+            background-color: #0284c7;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover { background-color: #0369a1; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li {
+            background: #334155;
+            margin-bottom: 8px;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border-left: 4px solid #38bdf8;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        .footer a { color: #94a3b8; text-decoration: none; }
+        .footer a:hover { color: #38bdf8; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🚀 Gestor de Items (FastAPI)</h2>
+        
+        <div class="input-group">
+            <input type="text" id="nuevoItem" placeholder="Escribe un nuevo objeto...">
+            <button onclick="agregarItem()">Añadir</button>
+        </div>
+
+        <h4>📦 Objetos guardados en la API:</h4>
+        <ul id="listaItems"></ul>
+
+        <div class="footer">
+            <a href="/docs" target="_blank">📑 Abrir documentación Swagger (/docs)</a>
+        </div>
+    </div>
+
+    <script>
+        // Función para pedir la lista a GET /items
+        async function cargarItems() {
+            const res = await fetch('/items');
+            const data = await res.json();
+            const lista = document.getElementById('listaItems');
+            lista.innerHTML = '';
+            data.items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                lista.appendChild(li);
+            });
+        }
+
+        // Función para enviar un objeto nuevo a POST /items
+        async function agregarItem() {
+            const input = document.getElementById('nuevoItem');
+            const nombre = input.value.trim();
+            if (!nombre) return;
+
+            await fetch('/items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre: nombre })
+            });
+            input.value = '';
+            cargarItems();
+        }
+
+        // Cargar la lista nada más abrir la página
+        cargarItems();
+    </script>
+</body>
+</html>
